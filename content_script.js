@@ -12,6 +12,8 @@ $(document).ready(function () {
     var w4u_autopilot = window.localStorage.getItem('w4u_autopilot');
     if (w4u_autopilot == '') w4u_autopilot = 0;
 
+    var w4u_autopilotCurrentTimer = '';
+
     console.log('W4U Caricata! =^..^=')
     console.log('Corso selezionato: ', w4u_lessonsGalleryUrl);
     console.log('Autopilot: ', w4u_autopilot);
@@ -78,11 +80,12 @@ $(document).ready(function () {
                 w4u_solveCaptcha();
             } else {
                 console.log('Singola lezione');
-                $('#list-lessons-tool').append(w4u_generateUiHtml("<button type='button' id='w4u_startNextVideo'>Avvia Prossimo Video</button>"));
+                $('#list-lessons-tool').append(w4u_generateUiHtml("<button type='button' id='w4u_startNextVideo'>Avvia Prossimo Video</button>\
+                <span style='color:red;' id='w4u_videoAlertDiv' hidden><br/><br/>Video bloccato, premere su \"Avvia Prossimo Video\" per riprendere</span>"));
 
                 if (w4u_autopilot == 1) {
                     w4u_findNextVideo();
-                    w4u_startCurrentVideo();
+                    setTimeout(w4u_startCurrentVideo, 500);
                 }
             }
 
@@ -125,7 +128,7 @@ $(document).ready(function () {
     }
 
     $('#w4u_startNextVideo').on('click', w4u_findNextVideo);
-    function w4u_findNextVideo() {
+    function w4u_findNextVideo(force = false) {
         console.log('Cerco video');
 
         let w4u_uncompletedVideos = [];
@@ -147,7 +150,7 @@ $(document).ready(function () {
         });
         console.log('Video mancanti: ', w4u_uncompletedVideos.length);
 
-        if (window.location.href.indexOf(w4u_uncompletedVideos[0]) > -1) {
+        if (!force && window.location.href.indexOf(w4u_uncompletedVideos[0]) > -1) {
             console.log('Video corrente ok');
         } else {
             if (w4u_uncompletedVideos.length > 0) {
@@ -162,8 +165,27 @@ $(document).ready(function () {
     }
 
     function w4u_startCurrentVideo() {
-        $('#control-play').trigger('click');
-        document.getElementById("my-video_html5_api").playbackRate = window.localStorage.getItem('w4u_videoSpeedMultiplier');
+        console.log('Starting video');
+        document.getElementById("control-play").click();
+        document.getElementById("my-video_html5_api").playbackRate = 3.8;
+        w4u_autopilotCurrentTimer = $('#currenttime_box').text();
+        setTimeout(w4u_checkAutopilotVideo, 2000);
+    }
+
+    function w4u_checkAutopilotVideo(){
+        console.log(w4u_autopilotCurrentTimer, $('#currenttime_box').text());
+        if(w4u_autopilotCurrentTimer == $('#currenttime_box').text()){
+            $('#w4u_videoAlertDiv').show();
+            chrome.runtime.sendMessage('', {
+                type: 'notification',
+                options: {
+                    title: 'Video Bloccato!',
+                    message: 'Intervieni manualmente',
+                    iconUrl: 'icon.png',
+                    type: 'basic'
+                }
+            });
+        }
     }
 
     function w4u_solveCaptcha() {
