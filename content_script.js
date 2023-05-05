@@ -69,8 +69,8 @@ $(document).ready(function () {
         window.localStorage.setItem('w4u_lessonsGalleryUrl', window.location.href);
         $('#GalleryContainer').prepend(w4u_generateUiHtml("<button type='button' id='w4u_openNextLesson'>Apri Prossima Lezione</button>"));
         if (w4u_autopilot == 1) {
-            setTimeout(w4u_findNextLesson, 3000);
-            $('#GalleryContainer').prepend('<h1 style="color: red;">Modalità Automatica Abilitata: inizio tra 3 secondi...</h1>')
+            setTimeout(w4u_findNextLesson, 5000);
+            $('#GalleryContainer').prepend('<h1 style="color: red;">Modalità Automatica Abilitata: inizio tra 5 secondi...</h1>')
         }
     }
     else
