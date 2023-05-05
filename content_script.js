@@ -65,6 +65,7 @@ $(document).ready(function () {
     }
     else if (window.location.href.indexOf('lp_controller') > -1) {
         console.log('Elenco lezioni');
+        w4u_openFolders();
         window.localStorage.setItem('w4u_lessonsGalleryUrl', window.location.href);
         $('#GalleryContainer').prepend(w4u_generateUiHtml("<button type='button' id='w4u_openNextLesson'>Apri Prossima Lezione</button>"));
         if (w4u_autopilot == 1) {
@@ -110,6 +111,13 @@ $(document).ready(function () {
         window.localStorage.setItem('w4u_autopilot', 0);
         w4u_autopilot = window.localStorage.getItem('w4u_autopilot');
         location.reload();
+    }
+
+    function w4u_openFolders(){
+        if ( $( ".span_folder" ).length ) {
+            console.log('Apro le cartelle');
+            $( ".span_folder" ).click();
+        }
     }
 
     $('#w4u_openNextLesson').on('click', w4u_findNextLesson);
