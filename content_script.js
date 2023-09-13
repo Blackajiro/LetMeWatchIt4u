@@ -126,7 +126,7 @@ $(document).ready(function () {
         let w4u_uncompletedLessons = [];
         $('.progressbar').each(function (idx) {
             console.log($(this).width() / $(this).parent().width() * 100);
-            if ($(this).width() / $(this).parent().width() * 100 <= 79) {
+            if ($(this).width() / $(this).parent().width() * 100 < 75) {
                 w4u_uncompletedLessons.push($(this).closest('.contenitore-sezione').find('a').attr('href'));
             }
         });
