@@ -1,11 +1,189 @@
+<!DOCTYPE html>
 <html>
-  <head></head>
-  <body style="min-width: 300px;min-height: 50px;padding: 2%;">
+<head>
+    <title>Let Me Watch it 4 U - Configurazione</title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            width: 320px;
+            padding: 20px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #fff3e0;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(255, 145, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .container::after {
+            content: '🐱';
+            position: absolute;
+            bottom: -10px;
+            right: -10px;
+            font-size: 40px;
+            opacity: 0.1;
+            transform: rotate(-15deg);
+        }
+        h2 {
+            color: #ff9100;
+            font-weight: 500;
+            margin: 0 0 20px 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        h2::before {
+            content: '😺';
+            font-size: 24px;
+        }
+        .setting-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .setting-group:last-child {
+            margin-bottom: 0;
+        }
+        label {
+            display: block;
+            color: #ff9100;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        input[type="number"] {
+            width: 70px;
+            padding: 8px;
+            border: 2px solid #ffcc80;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: #fff8e1;
+        }
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #ff9100;
+            background-color: white;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #ff9100;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        button:hover {
+            background-color: #f57c00;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(255, 145, 0, 0.2);
+        }
+        button:disabled {
+            background-color: #ffe0b2;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        button.secondary {
+            background-color: #fff;
+            color: #ff9100;
+            border: 2px solid #ff9100;
+        }
+        button.secondary:hover {
+            background-color: #fff3e0;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        #status {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff9100;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+        #status.show {
+            opacity: 1;
+        }
+        .divider {
+            height: 2px;
+            background: linear-gradient(to right, #ff9100, #ffcc80);
+            margin: 20px 0;
+            border-radius: 2px;
+        }
+        .speed-info {
+            margin-top: 8px;
+            color: #ff9100;
+            font-size: 12px;
+            background-color: #fff3e0;
+            padding: 8px;
+            border-radius: 4px;
+            border-left: 3px solid #ff9100;
+        }
+        .speed-info::before {
+            content: '😸';
+            margin-right: 4px;
+        }
+    </style>
+</head>
+<body>
     <div class="container">
-      <h3>Let Me Watch it 4 U =^..^=</h1>
-      <p>Accedi al nuovo portale per vedere la magia</p>
+        <h2>Let Me Watch it 4 U</h2>
+        
+        <div class="setting-group">
+            <label>Controlli Video 🎥</label>
+            <div class="button-group">
+                <button id="toggleVideo" class="secondary" disabled>😺 Play/Stop Video</button>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="setting-group">
+            <label>Modalità Automatica 🤖</label>
+            <button id="toggleAutopilot">😺 Caricamento...</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="setting-group">
+            <label>Velocità di riproduzione ⚡</label>
+            <div class="speed-control">
+                <input type="number" id="playbackSpeed" step="0.1" min="0.1" max="16">
+                <span>x</span>
+                <button id="saveSpeed">😺 Salva</button>
+            </div>
+            <div class="speed-info">
+                Miao! Velocità consigliate:<br>
+                • 1.5x per i corsi vecchi (sono un gatto pigro)<br>
+                • 1.0x per i corsi nuovi (mi piace prendermela comoda)
+            </div>
+        </div>
     </div>
-    <script src="jquery.min.js"></script>
+    <div id="status"></div>
     <script src="popup.js"></script>
-  </body>
+</body>
 </html>

@@ -5,190 +5,194 @@
 */
 
 $(document).ready(function () {
-
     /* Init */
+    let w4u_lessonsGalleryUrl, w4u_autopilot, w4u_playbackSpeed;
+    let w4u_autopilotCurrentTimer = '';
+    let w4u_videoPlaying = false;
 
-    var w4u_lessonsGalleryUrl = window.localStorage.getItem('w4u_lessonsGalleryUrl');
-    var w4u_autopilot = window.localStorage.getItem('w4u_autopilot');
-    if (w4u_autopilot == '') w4u_autopilot = 0;
+    // Crea il toast container
+    const toastContainer = $('<div>', {
+        id: 'w4u_toasts',
+        css: {
+            position: 'fixed',
+            top: '20px',
+            left: '20px',
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px'
+        }
+    }).appendTo('body');
 
-    var w4u_autopilotCurrentTimer = '';
+    function showToast(message, duration = 3000) {
+        const catEmojis = ['😺', '😸', '😹', '😻', '😽', '🐱'];
+        const randomCat = catEmojis[Math.floor(Math.random() * catEmojis.length)];
+        
+        const toast = $('<div>', {
+            css: {
+                backgroundColor: '#ff9100',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '12px',
+                fontSize: '14px',
+                fontFamily: 'Roboto, sans-serif',
+                boxShadow: '0 4px 12px rgba(255, 145, 0, 0.3)',
+                opacity: 0,
+                transition: 'all 0.3s',
+                transform: 'translateX(-100%)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+            },
+            html: `<span style="font-size: 20px;">${randomCat}</span><span>${message}</span>`
+        }).prependTo(toastContainer);
 
-    console.log('W4U Caricata! =^..^=')
-    console.log('Corso selezionato: ', w4u_lessonsGalleryUrl);
-    console.log('Autopilot: ', w4u_autopilot);
+        // Forza il reflow per attivare la transizione
+        toast[0].offsetHeight;
 
-    /* UI */
+        toast.css({
+            opacity: 1,
+            transform: 'translateX(0)'
+        });
 
-    function w4u_generateUiHtml(content, autopilot = true) {
+        setTimeout(() => {
+            toast.css({
+                opacity: 0,
+                transform: 'translateX(-100%)'
+            });
+            setTimeout(() => toast.remove(), 300);
+        }, duration);
+    }
 
-        let autopilotButton = '';
+    // Carica le impostazioni
+    chrome.storage.local.get(['w4u_lessonsGalleryUrl', 'w4u_autopilot', 'w4u_playbackSpeed'], function(result) {
+        w4u_lessonsGalleryUrl = result.w4u_lessonsGalleryUrl;
+        w4u_autopilot = result.w4u_autopilot || '0';
+        w4u_playbackSpeed = result.w4u_playbackSpeed || '1.5';
+        
+        initializePage();
+    });
 
-        if (autopilot) {
-            if (w4u_autopilot != 1) {
-                autopilotButton = "<button type='button' id='w4u_startAutopilot' style='margin-right: 10px;'>Abilita Modalità Automatica</button>";
-            } else {
-                autopilotButton = "<button type='button' id='w4u_stopAutopilot' style='margin-right: 10px;'>Disabilita Modalità Automatica</button>";
+    function initializePage() {
+        /* Gestione pagine */
+        if (window.location.href == 'https://lms.mercatorum.multiversity.click/' || 
+            window.location.href == 'https://lms-courses.mercatorum.multiversity.click/') {
+            if (w4u_lessonsGalleryUrl && w4u_autopilot == '1') {
+                showToast('Ti porto alla lezione...');
+                window.location.href = w4u_lessonsGalleryUrl;
             }
         }
-
-        return " \
-        <div style='margin:20px 0 20px 0;'>\
-            <div class='titolo-sezione'>Let Me Watch it 4 U =^..^=</div>\
-            <div class='contenitore-sezione'>"
-            + autopilotButton + content +
-            "</div>\
-        </div>\
-        ";
-
-    }
-
-    if (window.location.href == 'https://lms.mercatorum.multiversity.click/') {
-        console.log('Home');
-        if (w4u_lessonsGalleryUrl) {
-            setTimeout(function () {
-                $('.main-page-content').prepend(w4u_generateUiHtml("<a href='"+w4u_lessonsGalleryUrl+"'><button type='button' class='btn-mercatorum mr-auto mt-5 lippo-xxs:text-sm' id='w4u_resumeLessons'>Riprendi a \"\"Studiare\"\"</button></a>", false));
-            }, 2500);
-        } else {
-            setTimeout(function () {
-                $('.main-page-content').prepend(w4u_generateUiHtml("Ciao! Per iniziare vai in un elenco di videolezioni, mi ricorderò automaticamente tutto quello che hai da vedere! <br/>Usami quanto vuoi ma ricorda anche di studiare, capra che non sei altro.", false));
-            }, 2500);
+        else if (window.location.href.indexOf('lp_controller') > -1) {
+            chrome.storage.local.set({ w4u_lessonsGalleryUrl: window.location.href });
+            w4u_openFolders();
+            showToast('Miao! Ho trovato le videolezioni! Sono pronto a "studiare" con te! 😺', 5000);
+            if (w4u_autopilot == '1') {
+                setTimeout(() => {
+                    showToast('Modalità automatica attiva! Mi metto comodo sulla tastiera... 😸');
+                    setTimeout(w4u_findNextLesson, 5000);
+                }, 5000);
+            }
         }
-    }
-    else if (window.location.href == 'https://lms-courses.mercatorum.multiversity.click/') {
-        console.log('Home Secondaria');
-        if (w4u_lessonsGalleryUrl) {
-            $('#content').prepend(w4u_generateUiHtml("<button type='button' id='w4u_resumeLessons'>Riprendi a \"\"Studiare\"\"</button>", false));
-        } else {
-            $('#content').prepend(w4u_generateUiHtml("Ciao! Per iniziare vai in un elenco di videolezioni, mi ricorderò automaticamente tutto quello che hai da vedere! <br/>Usami quanto vuoi ma ricorda anche di studiare, capra che non sei altro.", false));
-        }
-    }
-    else if (window.location.href.indexOf('lp_controller') > -1) {
-        console.log('Elenco lezioni');
-        w4u_openFolders();
-        window.localStorage.setItem('w4u_lessonsGalleryUrl', window.location.href);
-        $('#GalleryContainer').prepend(w4u_generateUiHtml("<button type='button' id='w4u_openNextLesson'>Apri Prossima Lezione</button>"));
-        if (w4u_autopilot == 1) {
-            setTimeout(w4u_findNextLesson, 5000);
-            $('#GalleryContainer').prepend('<h1 style="color: red;">Modalità Automatica Abilitata: inizio tra 5 secondi...</h1>')
-        }
-    }
-    else
-        if (window.location.href.indexOf('lp-video_student_view') > -1) {
-
+        else if (window.location.href.indexOf('lp-video_student_view') > -1) {
             if ($('#reCaptchaForm').length) {
-                console.log('Captcha');
+                showToast('Ops! C\'è un Captcha! Non ho le zampine per risolverlo... 🐾');
                 w4u_solveCaptcha();
             } else {
-                console.log('Singola lezione');
-                $('#list-lessons-tool').append(w4u_generateUiHtml("<button type='button' id='w4u_startNextVideo'>Avvia Prossimo Video</button>\
-                <span style='color:red;' id='w4u_videoAlertDiv' hidden><br/><br/>Video bloccato, premere su \"Avvia Prossimo Video\" per riprendere</span>"));
-
-                if (w4u_autopilot == 1) {
+                if (w4u_autopilot == '1') {
+                    showToast('Avvio il video e mi faccio un pisolino...');
                     w4u_findNextVideo();
                     setTimeout(w4u_startCurrentVideo, 500);
                 }
             }
-
         }
+    }
 
     /* Metodi */
-
-    $('#w4u_resumeLessons').on('click', w4u_resumeLessons);
-    function w4u_resumeLessons() {
-        window.location.href = w4u_lessonsGalleryUrl;
-    }
-
-    $('#w4u_startAutopilot').on('click', w4u_startAutopilot);
-    function w4u_startAutopilot() {
-        window.localStorage.setItem('w4u_autopilot', 1);
-        w4u_autopilot = window.localStorage.getItem('w4u_autopilot')
-        location.reload();
-    }
-
-    $('#w4u_stopAutopilot').on('click', w4u_stopAutopilot);
-    function w4u_stopAutopilot() {
-        window.localStorage.setItem('w4u_autopilot', 0);
-        w4u_autopilot = window.localStorage.getItem('w4u_autopilot');
-        location.reload();
-    }
-
     function w4u_openFolders(){
-        if ( $( ".span_folder" ).length ) {
-            console.log('Apro le cartelle');
-            $( ".span_folder" ).click();
+        if ($('.span_folder').length) {
+            $('.span_folder').click();
+            showToast('Apertura cartelle...');
         }
     }
 
-    $('#w4u_openNextLesson').on('click', w4u_findNextLesson);
     function w4u_findNextLesson() {
-        console.log('Cerco lezioni');
         let w4u_uncompletedLessons = [];
         $('.progressbar').each(function (idx) {
-            console.log($(this).width() / $(this).parent().width() * 100);
             if ($(this).width() / $(this).parent().width() * 100 < 75) {
                 w4u_uncompletedLessons.push($(this).closest('.contenitore-sezione').find('a').attr('href'));
             }
         });
-        console.log('Lezioni mancanti: ', w4u_uncompletedLessons.length);
-        console.log('Prossima lezione: ', w4u_uncompletedLessons[0])
-        window.location.href = w4u_uncompletedLessons[0];
+        
+        if (w4u_uncompletedLessons.length > 0) {
+            showToast(`Trovate ${w4u_uncompletedLessons.length} lezioni da completare`);
+            window.location.href = w4u_uncompletedLessons[0];
+        } else {
+            showToast('Tutte le lezioni sono state completate!');
+        }
     }
 
-    $('#w4u_startNextVideo').on('click', w4u_findNextVideo);
     function w4u_findNextVideo(force = false) {
-        console.log('Cerco video');
-
         let w4u_uncompletedVideos = [];
         $('.list-group-item').each(function (idx) {
-
             if ($(this).text().indexOf('Torna lista') > -1) {
-                window.localStorage.setItem('w4u_lessonsGalleryUrl', $(this).attr('href'));
-                w4u_lessonsGalleryUrl = window.localStorage.getItem('w4u_lessonsGalleryUrl');
+                chrome.storage.local.set({ w4u_lessonsGalleryUrl: $(this).attr('href') });
             } else if (
                 $(this).text().indexOf('Test di') == -1 &&
                 (
-                    $(this).find('.pull-right').find('i').attr('class') != 'icon-check' || $(this).find('.pull-right').find('i').css('color') == 'rgb(255, 0, 0)'
+                    $(this).find('.pull-right').find('i').attr('class') != 'icon-check' || 
+                    $(this).find('.pull-right').find('i').css('color') == 'rgb(255, 0, 0)'
                 )
             ) {
                 w4u_uncompletedVideos.push($(this).attr('href'));
             }
-            $('#test').find('.pull-right').find('i').attr('class') == 'icon-check' &&
-                $('#test').find('.pull-right').find('i').css('color') == "rgb(255, 0, 0)"
         });
-        console.log('Video mancanti: ', w4u_uncompletedVideos.length);
 
         if (!force && window.location.href.indexOf(w4u_uncompletedVideos[0]) > -1) {
-            console.log('Video corrente ok');
+            showToast('Video corrente da completare');
         } else {
             if (w4u_uncompletedVideos.length > 0) {
-                console.log('Prossimo video: ', w4u_uncompletedVideos[0]);
+                showToast(`Trovati ${w4u_uncompletedVideos.length} video da completare`);
                 window.location.href = w4u_uncompletedVideos[0];
             } else {
-                console.log('Lezione terminata, apro la prossima', w4u_lessonsGalleryUrl);
+                showToast('Lezione completata, passaggio alla prossima');
                 window.location.href = w4u_lessonsGalleryUrl;
             }
         }
-
     }
 
     function w4u_startCurrentVideo() {
-        console.log('Starting video');
-        document.getElementById("control-play").click();
-        document.getElementById("my-video_html5_api").playbackRate = 3.8;
-        w4u_autopilotCurrentTimer = $('#currenttime_box').text();
-        setTimeout(w4u_checkAutopilotVideo, 2000);
+        const video = document.getElementById("my-video_html5_api");
+        if (video) {
+            document.getElementById("control-play").click();
+            video.playbackRate = parseFloat(w4u_playbackSpeed);
+            w4u_videoPlaying = true;
+            showToast(`Miao! Video avviato a ${w4u_playbackSpeed}x... Mi piace correre! 🏃‍♂️`);
+            w4u_autopilotCurrentTimer = $('#currenttime_box').text();
+            setTimeout(w4u_checkAutopilotVideo, 2000);
+            return true;
+        }
+        return false;
+    }
+
+    function w4u_stopCurrentVideo() {
+        const video = document.getElementById("my-video_html5_api");
+        if (video) {
+            document.getElementById("control-pause").click();
+            w4u_videoPlaying = false;
+            showToast('Pausa! Mi faccio un pisolino... 😴');
+            return true;
+        }
+        return false;
     }
 
     function w4u_checkAutopilotVideo(){
-        console.log(w4u_autopilotCurrentTimer, $('#currenttime_box').text());
         if(w4u_autopilotCurrentTimer == $('#currenttime_box').text()){
-            $('#w4u_videoAlertDiv').show();
+            showToast('Miao! Il video si è bloccato! Ricarica la pagina che mi sono addormentato...');
             chrome.runtime.sendMessage('', {
                 type: 'notification',
                 options: {
-                    title: 'Video Bloccato!',
-                    message: 'Intervieni manualmente',
+                    title: 'Miao! Video Bloccato! 😿',
+                    message: 'Ricarica la pagina che mi sono addormentato...',
                     iconUrl: 'icon.png',
                     type: 'basic'
                 }
@@ -208,4 +212,49 @@ $(document).ready(function () {
         });
     }
 
+    /* Gestione messaggi dal popup */
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        switch(request.action) {
+            case 'updatePlaybackSpeed':
+                w4u_playbackSpeed = request.speed;
+                const video = document.getElementById("my-video_html5_api");
+                if (video) {
+                    video.playbackRate = parseFloat(request.speed);
+                    showToast(`Velocità impostata a ${request.speed}x`);
+                }
+                break;
+            
+            case 'toggleAutopilot':
+                w4u_autopilot = request.enabled ? '1' : '0';
+                if (request.enabled) {
+                    showToast('Modalità automatica attivata');
+                    initializePage();
+                } else {
+                    showToast('Modalità automatica disattivata');
+                }
+                break;
+            
+            case 'toggleVideo':
+                let success = false;
+                if (w4u_videoPlaying) {
+                    success = w4u_stopCurrentVideo();
+                } else {
+                    success = w4u_startCurrentVideo();
+                }
+                sendResponse({
+                    success: success,
+                    playing: w4u_videoPlaying
+                });
+                break;
+
+            case 'getVideoState':
+                const videoExists = document.getElementById("my-video_html5_api") !== null;
+                sendResponse({
+                    exists: videoExists,
+                    playing: w4u_videoPlaying
+                });
+                break;
+        }
+        return true; // Necessario per sendResponse asincrono
+    });
 });

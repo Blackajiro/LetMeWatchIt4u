@@ -1,28 +1,31 @@
 {
-  "name": "Let Me Watch It 4 U",
-  "description": "No more wasted time watching useless lessons",
-  "version": "1.0",
   "manifest_version": 3,
+  "name": "Let Me Watch it 4 U",
+  "version": "1.0",
+  "description": "Automatizza la visualizzazione delle videolezioni",
+  "permissions": [
+    "storage",
+    "notifications",
+    "activeTab"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": "icon.png"
   },
-  "content_scripts": [  
-    {  
-      "matches": ["http://*/*", "https://*/*"],  
-      "js": ["jquery.min.js", "content_script.js"]  
-    }  
-  ], 
-  "background": {
-    "service_worker": "background.js"
-  },
-  "web_accessible_resources": [{ 
-    "resources": ["icon.png", "sound.mp3"],
-    "matches": ["http://*/*", "https://*/*"]
-  }],
-  "permissions": [
-    "notifications",
-    "storage",
-    "tabs"
-  ]
+  "content_scripts": [
+    {
+      "matches": [
+        "https://lms.mercatorum.multiversity.click/*",
+        "https://lms-courses.mercatorum.multiversity.click/*"
+      ],
+      "js": [
+        "jquery.min.js",
+        "content_script.js"
+      ]
+    }
+  ],
+  "icons": {
+    "48": "icon.png",
+    "128": "icon.png"
+  }
 }
