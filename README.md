@@ -1,7 +1,16 @@
 # 😺 LetMeWatchIt4u
 
-## 🐱 Miao! [Italiano]
+# ⚠️ DISCLAIMER LEGALE / LEGAL DISCLAIMER
 
+## 🚫 [Italiano]
+ATTENZIONE: Questa estensione è stata creata solo a scopo dimostrativo/educativo. L'utilizzo di strumenti per automatizzare la visualizzazione delle lezioni non è consentito dall'Ateneo e potrebbe violare i termini di servizio della piattaforma. L'uso di questo software è a proprio rischio e pericolo. Lo sviluppatore declina ogni responsabilità per eventuali conseguenze derivanti dall'utilizzo di questa estensione, incluse ma non limitate a: sospensione dell'account, annullamento degli esami o azioni legali da parte dell'Università. Utilizzando questa estensione, l'utente si assume piena responsabilità delle proprie azioni.
+
+## 🚫 [English]
+WARNING: This extension was created for demonstrative/educational purposes only. The use of tools to automate lesson viewing is not allowed by the University and may violate the platform's terms of service. Use this software at your own risk. The developer disclaims all responsibility for any consequences arising from the use of this extension, including but not limited to: account suspension, exam cancellation, or legal action by the University. By using this extension, the user assumes full responsibility for their actions.
+
+---
+
+## 🐱 Miao! [Italiano]
 Ciao! Sono un gattino molto speciale che ama guardare le videolezioni di UniMercatorum al posto tuo!
 
 ### 📥 Installazione
