@@ -27,9 +27,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadSettings() {
         chrome.storage.local.get(['w4u_autopilot', 'w4u_playbackSpeed'], function(result) {
             const autopilot = result.w4u_autopilot || '0';
-            const speed = result.w4u_playbackSpeed || '1.5';
+            const speed = result.w4u_playbackSpeed || '1';
 
-            toggleAutopilotBtn.textContent = autopilot === '1' ? 'Disattiva Autopilot' : 'Attiva Autopilot';
+            toggleAutopilotBtn.textContent = autopilot === '1' ? 'Disattiva Micio Autopilot' : 'Attiva Micio Autopilot';
             playbackSpeedInput.value = speed;
         });
 
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const newValue = currentValue === '1' ? '0' : '1';
             
             chrome.storage.local.set({ w4u_autopilot: newValue }, function() {
-                toggleAutopilotBtn.textContent = newValue === '1' ? 'Disattiva Autopilot' : 'Attiva Autopilot';
+                toggleAutopilotBtn.textContent = newValue === '1' ? 'Disattiva Micio Autopilot' : 'Attiva Micio Autopilot';
                 
                 chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
                     chrome.tabs.sendMessage(tabs[0].id, {

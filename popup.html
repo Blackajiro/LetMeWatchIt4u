@@ -143,10 +143,6 @@
             border-radius: 4px;
             border-left: 3px solid #ff9100;
         }
-        .speed-info::before {
-            content: '😸';
-            margin-right: 4px;
-        }
     </style>
 </head>
 <body>
@@ -154,32 +150,30 @@
         <h2>Let Me Watch it 4 U</h2>
         
         <div class="setting-group">
-            <label>Controlli Video 🎥</label>
+            <label>Controlli Video</label>
             <div class="button-group">
-                <button id="toggleVideo" class="secondary" disabled>😺 Play/Stop Video</button>
+                <button id="toggleVideo" disabled>Play/Stop Video</button>
             </div>
         </div>
 
         <div class="divider"></div>
 
         <div class="setting-group">
-            <label>Modalità Automatica 🤖</label>
-            <button id="toggleAutopilot">😺 Caricamento...</button>
+            <label>Modalità Automiatica</label>
+            <button id="toggleAutopilot">Caricamento...</button>
         </div>
 
         <div class="divider"></div>
 
         <div class="setting-group">
-            <label>Velocità di riproduzione ⚡</label>
+            <label>Velocità di riproduzione</label>
             <div class="speed-control">
                 <input type="number" id="playbackSpeed" step="0.1" min="0.1" max="16">
                 <span>x</span>
-                <button id="saveSpeed">😺 Salva</button>
+                <button id="saveSpeed">Salva</button>
             </div>
             <div class="speed-info">
-                Miao! Velocità consigliate:<br>
-                • 1.5x per i corsi vecchi (sono un gatto pigro)<br>
-                • 1.0x per i corsi nuovi (mi piace prendermela comoda)
+                I video potrebbero non funzionare se la velocità di riproduzione è diversa da 1x
             </div>
         </div>
     </div>
